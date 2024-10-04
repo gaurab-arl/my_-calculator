@@ -4,9 +4,11 @@
 #include <cstdlib> // For exit()
 #include <conio.h> // For getch()
 #include <cstdio>  // For sscanf()
+#include <stack>   // For parentheses evaluation
 
 using namespace std;
 
+// Basic calculation function
 template<typename T>
 T cal(T o1, char op, T o2) {
     switch (op) {
@@ -27,22 +29,49 @@ T cal(T o1, char op, T o2) {
     }
 }
 
-void separate(string expression) {
+// Function to evaluate an expression without parentheses
+float evaluate(string expression) {
     float o1, o2;
     char op;
-    
-    if (sscanf(expression.c_str(), "%f %c %f", &o1, &op, &o2) == 3) { // Ensure correct parsing
-        float out = cal(o1, op, o2);
-        cout << "Result: " << out << endl;
+
+    // Parse the expression (e.g., "10 + 20")
+    if (sscanf(expression.c_str(), "%f %c %f", &o1, &op, &o2) == 3) {
+        return cal(o1, op, o2);
     } else {
         cout << "Invalid expression!" << endl;
+        return 0;
     }
+}
+
+// Function to handle parentheses by evaluating inner expressions first
+void separate(string expression) {
+    size_t open = expression.find_last_of('(');
+    size_t close = expression.find(')', open);
+
+    while (open != string::npos && close != string::npos) {
+        // Extract the inner expression
+        string innerExpr = expression.substr(open + 1, close - open - 1);
+
+        // Evaluate the inner expression recursively
+        float innerResult = evaluate(innerExpr);
+
+        // Replace the inner expression with its result in the main expression
+        expression.replace(open, close - open + 1, to_string(innerResult));
+
+        // Find next parentheses
+        open = expression.find_last_of('(');
+        close = expression.find(')', open);
+    }
+
+    // Now handle the expression without parentheses
+    float result = evaluate(expression);
+    cout << "Result: " << result << endl;
 }
 
 int main() {
     while (true) {
         string expression;
-        cout << "Enter the expression (e.g., 10 + 20) or 'quit' to exit: ";
+        cout << "Enter the expression (e.g., 10 + (20 * 30)) or 'quit' to exit: ";
         getline(cin, expression);
 
         if (expression == "quit") {
@@ -53,6 +82,6 @@ int main() {
         getch();  // Wait for a key press
         system("cls");  // Clear the screen
     }
-    
+
     return 0;
 }
