@@ -1,0 +1,58 @@
+#include <iostream>
+#include <string>
+#include <cmath>
+#include <cstdlib> // For exit()
+#include <conio.h> // For getch()
+#include <cstdio>  // For sscanf()
+
+using namespace std;
+
+template<typename T>
+T cal(T o1, char op, T o2) {
+    switch (op) {
+        case '+': return o1 + o2;
+        case '-': return o1 - o2;
+        case '*': return o1 * o2;
+        case '/':
+            if (o2 != 0)
+                return o1 / o2;
+            else {
+                cout << "Division by zero error!" << endl;
+                return 0;
+            }
+        case '^': return pow(o1, o2); 
+        default:
+            cout << "Invalid operator!" << endl;
+            return 0;
+    }
+}
+
+void separate(string expression) {
+    float o1, o2;
+    char op;
+    
+    if (sscanf(expression.c_str(), "%f %c %f", &o1, &op, &o2) == 3) { // Ensure correct parsing
+        float out = cal(o1, op, o2);
+        cout << "Result: " << out << endl;
+    } else {
+        cout << "Invalid expression!" << endl;
+    }
+}
+
+int main() {
+    while (true) {
+        string expression;
+        cout << "Enter the expression (e.g., 10 + 20) or 'quit' to exit: ";
+        getline(cin, expression);
+
+        if (expression == "quit") {
+            exit(0); // Exit the program if 'quit' is entered
+        }
+
+        separate(expression);
+        getch();  // Wait for a key press
+        system("cls");  // Clear the screen
+    }
+    
+    return 0;
+}
